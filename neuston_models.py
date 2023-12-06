@@ -136,11 +136,17 @@ class NeustonModel(ptl.LightningModule):
         self.log('train_loss', self.agg_train_loss, on_epoch=True)
         self.log('val_loss', validation_loss, on_epoch=True)
 
+        # error logging ndarray values
+        outputs_torch = torch.cat([batch['val_outputs'] for batch in self.validation_step_outputs],dim=0).detach().cpu()
+        output_classes_torch = torch.argmax(outputs, axis=1)
+        input_classes_torch = torch.cat([batch['val_input_classes'] for batch in self.validation_step_outputs],dim=0).detach().cpu()
+        input_srcs_torch = [item for sublist in [batch['val_input_srcs'] for batch in self.validation_step_outputs] for item in sublist]
+
         # csv_logger logger hacked to not include these in epochs.csv output
-        self.log('input_classes', input_classes, on_epoch=True)
-        self.log('output_classes', output_classes, on_epoch=True)
-        self.log('input_srcs', input_srcs, on_epoch=True)
-        self.log('outputs', outputs, on_epoch=True)
+        self.log('input_classes', input_classes_torch, on_epoch=True)
+        self.log('output_classes', output_classes_torch, on_epoch=True)
+        self.log('input_srcs', input_srcs_torch, on_epoch=True)
+        self.log('outputs', outputs_torch, on_epoch=True)
 
         # these will apppear in epochs.csv, but are not used by callbacks
         self.log('f1_macro',f1_macro, on_epoch=True)
