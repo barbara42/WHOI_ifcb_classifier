@@ -59,6 +59,7 @@ class NeustonModel(ptl.LightningModule):
         self.best_val_loss = np.inf
         self.best_epoch = 0
         self.agg_train_loss = 0.0
+        self.validation_step_outputs = []
 
     def configure_optimizers(self):
         return Adam(self.parameters(), lr=0.001)
@@ -97,16 +98,18 @@ class NeustonModel(ptl.LightningModule):
         val_batch_loss = self.loss(input_classes, outputs)
         outputs = outputs.logits if isinstance(outputs,InceptionOutputs) else outputs
         outputs = softmax(outputs,dim=1)
-        return dict(val_batch_loss=val_batch_loss,
+        output_dict = dict(val_batch_loss=val_batch_loss,
                     val_outputs=outputs,
                     val_input_classes=input_classes,
                     val_input_srcs=input_src)
+        self.validation_step_outputs.append(output_dict)
+        return output_dict
 
-    def on_validation_epoch_end(self, steps):
+    def on_validation_epoch_end(self):
         print(end='\n\n') # give space for progress bar
         if self.current_epoch==0: self.best_val_loss = np.inf  # takes care of any lingering val_loss from sanity checks
 
-        validation_loss = torch.stack([batch['val_batch_loss'] for batch in steps]).sum()
+        validation_loss = torch.stack([batch['val_batch_loss'] for batch in self.validation_step_outputs]).sum()
         #eoe0 = 'validation_epoch_end: best_val_loss={}, curr_val_loss={}, curr<best={}, curr-best (neg is good)={}'
         #eoe0 = eoe0.format(self.best_val_loss, validation_loss.item(), validation_loss.item()<self.best_val_loss, validation_loss.item()-self.best_val_loss)
         #print(eoe0)
@@ -115,10 +118,10 @@ class NeustonModel(ptl.LightningModule):
             self.best_val_loss = validation_loss.item()
             self.best_epoch = self.current_epoch
 
-        outputs = torch.cat([batch['val_outputs'] for batch in steps],dim=0).detach().cpu().numpy()
+        outputs = torch.cat([batch['val_outputs'] for batch in self.validation_step_outputs],dim=0).detach().cpu().numpy()
         output_classes = np.argmax(outputs, axis=1)
-        input_classes = torch.cat([batch['val_input_classes'] for batch in steps],dim=0).detach().cpu().numpy()
-        input_srcs = [item for sublist in [batch['val_input_srcs'] for batch in steps] for item in sublist]
+        input_classes = torch.cat([batch['val_input_classes'] for batch in self.validation_step_outputs],dim=0).detach().cpu().numpy()
+        input_srcs = [item for sublist in [batch['val_input_srcs'] for batch in self.validation_step_outputs] for item in sublist]
 
         f1_weighted = metrics.f1_score(input_classes, output_classes, average='weighted')
         f1_macro = metrics.f1_score(input_classes, output_classes, average='macro')
