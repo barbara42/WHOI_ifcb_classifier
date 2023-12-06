@@ -16,6 +16,9 @@ from pytorch_lightning.loggers.csv_logs import CSVLogger,ExperimentWriter
 from torchvision.datasets.folder import IMG_EXTENSIONS
 
 # project imports
+# work-around for pyifcb package, install not working with M1 chip
+# import sys 
+# sys.path.insert(1, '../pyifcb')
 import ifcb
 from neuston_models import NeustonModel
 from neuston_callbacks import SaveValidationResults, SaveTestResults
@@ -39,6 +42,9 @@ def do_training(args):
     # ARG CORRECTIONS AND CHECKS
     date_str = args.cmd_timestamp.split('T')[0]
     args.model_id = args.model_id.format(TRAIN_DATE=date_str, TRAIN_ID=args.TRAIN_ID)
+
+    # TODO: REMOVE 
+    print(args)
 
     # make sure output directory exists
     os.makedirs(args.outdir,exist_ok=True)
@@ -98,13 +104,20 @@ def do_training(args):
     chkpt_path = os.path.join(args.outdir, 'chkpts')
     os.makedirs(chkpt_path, exist_ok=True)
     callbacks.append(ModelCheckpoint(dirpath=chkpt_path, monitor='val_loss'))
+    # trainer = Trainer(deterministic=True, logger=logger,
+    #                   gpus=len(args.gpus) if args.gpus else None,
+    #                   max_epochs=args.emax, min_epochs=args.emin,
+    #                   checkpoint_callback=True,
+    #                   callbacks=callbacks,
+    #                   num_sanity_val_steps=0
+    #                   )
+    # changed because of "unexpected keyword argument 'gpus'" error
     trainer = Trainer(deterministic=True, logger=logger,
-                      gpus=len(args.gpus) if args.gpus else None,
-                      max_epochs=args.emax, min_epochs=args.emin,
-                      checkpoint_callback=True,
-                      callbacks=callbacks,
-                      num_sanity_val_steps=0
-                      )
+                    max_epochs=args.emax, min_epochs=args.emin,
+                    callbacks=callbacks,
+                    num_sanity_val_steps=0, 
+                    accelerator="gpu"
+                    )
 
     # Setup Model
     classifier = NeustonModel(args)
@@ -112,7 +125,8 @@ def do_training(args):
     # see https://pytorch-lightning.readthedocs.io/en/stable/training_tricks.html#auto-scaling-of-batch-size
 
     # Do Training
-    trainer.fit(classifier, train_dataloader=training_loader, val_dataloaders=validation_loader)
+    #trainer.fit(classifier, train_dataloader=training_loader, val_dataloaders=validation_loader)
+    trainer.fit(classifier, training_loader, validation_loader)
 
     # Copy best model
     checkpoint_path = trainer.checkpoint_callback.best_model_path

@@ -17,7 +17,7 @@ from neuston_data import IfcbBinDataset
 
 ## Training ##
 
-class SaveValidationResults(ptl.callbacks.base.Callback):
+class SaveValidationResults(ptl.callbacks.Callback):
 
     def __init__(self, outdir, outfile, series, best_only=True):
         self.outdir = outdir
@@ -272,7 +272,7 @@ def _save_run_results(outfile, results):
     if outfile.endswith('.h5'): _save_run_results_hdf(outfile, results)
 
 
-class SaveTestResults(ptl.callbacks.base.Callback):
+class SaveTestResults(ptl.callbacks.Callback):
 
     def __init__(self, outdir, outfile, timestamp):
         self.outdir = outdir

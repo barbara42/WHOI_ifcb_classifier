@@ -85,7 +85,7 @@ class NeustonModel(ptl.LightningModule):
         self.agg_train_loss += batch_loss.item()
         return dict(loss=batch_loss)
 
-    def training_epoch_end(self, steps):
+    def on_train_epoch_end(self, steps):
         train_loss = torch.stack([batch['loss'] for batch in steps]).sum().item()
         #print('training_epoch_end: self.agg_train_loss={:.5f}, train_loss={:.5f}, DIFF={:.9f}'.format(self.agg_train_loss, train_loss, self.agg_train_loss-train_loss), end='\n\n')
         #return dict(train_loss=train_loss)
@@ -102,7 +102,7 @@ class NeustonModel(ptl.LightningModule):
                     val_input_classes=input_classes,
                     val_input_srcs=input_src)
 
-    def validation_epoch_end(self, steps):
+    def on_validation_epoch_end(self, steps):
         print(end='\n\n') # give space for progress bar
         if self.current_epoch==0: self.best_val_loss = np.inf  # takes care of any lingering val_loss from sanity checks
 
