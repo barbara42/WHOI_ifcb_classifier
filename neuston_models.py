@@ -138,7 +138,7 @@ class NeustonModel(ptl.LightningModule):
 
         # error logging ndarray values
         outputs_torch = torch.cat([batch['val_outputs'] for batch in self.validation_step_outputs],dim=0).detach().cpu()
-        output_classes_torch = torch.argmax(outputs, axis=1)
+        output_classes_torch = torch.argmax(outputs_torch, axis=1)
         input_classes_torch = torch.cat([batch['val_input_classes'] for batch in self.validation_step_outputs],dim=0).detach().cpu()
         input_srcs_torch = [item for sublist in [batch['val_input_srcs'] for batch in self.validation_step_outputs] for item in sublist]
 
