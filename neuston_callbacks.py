@@ -36,6 +36,15 @@ class SaveValidationResults(ptl.callbacks.Callback):
         class_labels = pl_module.hparams.classes
         class_idxs = list(range(len(class_labels)))
 
+        try:
+            val_dataset = pl_module.trainer.val_dataloader().dataset
+            print("pl_module.trainer.val_dataloader().dataset WORKED")
+        except Exception as e:
+            print("pl_module.trainer.val_dataloader().dataset DID NOT WORK")
+            # Handle any other unexpected exceptions
+            print("An unexpected error occurred:", str(e))
+        
+
         val_dataset = pl_module.val_dataloader().dataset
         train_dataset = pl_module.train_dataloader().dataset
         val_counts_perclass = val_dataset.count_perclass

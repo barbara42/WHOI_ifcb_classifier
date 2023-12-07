@@ -125,6 +125,13 @@ def do_training(args):
     # see https://pytorch-lightning.readthedocs.io/en/stable/training_tricks.html#auto-scaling-of-batch-size
 
     # Do Training
+    try:
+        trainer.fit(classifier, train_dataloaders=training_loader, val_dataloaders=validation_loader)
+        print("using named params for trainer.fit WORKED")
+    except Exception as e:
+        print("using named params for trainer.fit DID NOT WORK")
+        # Handle any other unexpected exceptions
+        print("An unexpected error occurred:", str(e))
     #trainer.fit(classifier, train_dataloader=training_loader, val_dataloaders=validation_loader)
     trainer.fit(classifier, training_loader, validation_loader)
 
