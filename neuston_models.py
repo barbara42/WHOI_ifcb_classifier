@@ -60,6 +60,7 @@ class NeustonModel(ptl.LightningModule):
         self.best_epoch = 0
         self.agg_train_loss = 0.0
         self.validation_step_outputs = []
+        self.training_step_outputs = []
 
     def configure_optimizers(self):
         return Adam(self.parameters(), lr=0.001)
@@ -84,10 +85,12 @@ class NeustonModel(ptl.LightningModule):
         outputs = self.forward(input_data)
         batch_loss = self.loss(input_classes, outputs)
         self.agg_train_loss += batch_loss.item()
-        return dict(loss=batch_loss)
+        output_dict = dict(loss=batch_loss)
+        self.training_step_outputs.append(output_dict)
+        return output_dict
 
-    def on_train_epoch_end(self, steps):
-        train_loss = torch.stack([batch['loss'] for batch in steps]).sum().item()
+    def on_train_epoch_end(self):
+        train_loss = torch.stack([batch['loss'] for batch in self.training_step_outputs]).sum().item()
         #print('training_epoch_end: self.agg_train_loss={:.5f}, train_loss={:.5f}, DIFF={:.9f}'.format(self.agg_train_loss, train_loss, self.agg_train_loss-train_loss), end='\n\n')
         #return dict(train_loss=train_loss)
 
