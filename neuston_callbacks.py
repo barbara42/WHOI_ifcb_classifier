@@ -39,7 +39,7 @@ class SaveValidationResults(ptl.callbacks.Callback):
         # ptl 2 => An unexpected error occurred: `val_dataloader` must be implemented to be used with the Lightning Trainer
         # val_dataset = pl_module.val_dataloader().dataset
         # train_dataset = pl_module.train_dataloader().dataset
-        val_dataset = trainer.val_dataloader.dataset
+        val_dataset = trainer.val_dataloaders.dataset
         train_dataset = trainer.train_dataloader.dataset
         val_counts_perclass = val_dataset.count_perclass
         train_counts_perclass = train_dataset.count_perclass
