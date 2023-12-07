@@ -137,11 +137,12 @@ class NeustonModel(ptl.LightningModule):
         self.log('val_loss', validation_loss, on_epoch=True)
 
         # # csv_logger logger hacked to not include these in epochs.csv output
-        # # issues with logging - commenting out :'( 
-        self.log('input_classes', input_classes, on_epoch=True)
-        self.log('output_classes', output_classes, on_epoch=True)
-        self.log('input_srcs', input_srcs, on_epoch=True)
-        self.log('outputs', outputs, on_epoch=True)
+        # # issues with logging - commenting out :'(
+        # # v2.1.2: self.log functionality of LightningModule only supports logging scalar values 
+        # self.log('input_classes', input_classes, on_epoch=True)
+        # self.log('output_classes', output_classes, on_epoch=True)
+        # self.log('input_srcs', input_srcs, on_epoch=True)
+        # self.log('outputs', outputs, on_epoch=True)
 
         # these will apppear in epochs.csv, but are not used by callbacks
         self.log('f1_macro',f1_macro, on_epoch=True)

@@ -59,7 +59,9 @@ def do_training(args):
     for result_file in args.result_files:
         svr = SaveValidationResults(outdir=args.outdir, outfile=result_file[0], series=result_file[1:])
         validation_results_callbacks.append(svr)
-    callbacks.extend(validation_results_callbacks)
+    # commenting out because validation results rely on the logger logging ndarrays or tensors
+    # v2.1.2: self.log functionality of LightningModule only supports logging scalar values 
+    #callbacks.extend(validation_results_callbacks)
     callbacks.extend(plotting_callbacks)
     if args.estop:
         callbacks.append( EarlyStopping('val_loss', patience=args.estop) )
