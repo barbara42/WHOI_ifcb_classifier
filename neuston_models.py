@@ -171,7 +171,8 @@ class NeustonModel(ptl.LightningModule):
 
     def on_test_epoch_end(self):
         # handle single and multiple test dataloaders
-        datasets = self.test_dataloader()
+        #datasets = self.test_dataloader()
+        datasets = self.dataloaders
         steps = self.testing_step_outputs
         if isinstance(datasets, list): datasets = [ds.dataset for ds in datasets]
         else: datasets = [datasets.dataset]
