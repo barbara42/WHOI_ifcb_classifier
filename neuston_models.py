@@ -201,9 +201,9 @@ class NeustonModel(ptl.LightningModule):
         now = datetime.now()
         filename = "runResults" + now.strftime("%Y-%m-%d %H:%M:%S")
         with open(filename, 'w', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=['inputs', 'outputs'])
+            writer = csv.writer(file)
             for rr in RRs:
-                writer.writerows(rr)
+                writer.writerows(zip(rr.inputs, rr.outputs))
         #return dict(RunResults=RRs)
 
     class RunResults:
