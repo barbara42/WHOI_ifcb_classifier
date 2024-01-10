@@ -327,7 +327,7 @@ def do_run(args):
         image_loader = DataLoader(image_dataset, batch_size=args.batch_size,
                                   pin_memory=True, num_workers=args.loaders)
 
-        trainer.test(classifier,test_dataloaders=image_loader)
+        trainer.test(classifier,dataloaders=image_loader)
 
 
 def argparse_nn(parser=None):
