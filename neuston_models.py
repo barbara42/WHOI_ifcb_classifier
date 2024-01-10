@@ -61,6 +61,8 @@ class NeustonModel(ptl.LightningModule):
         self.agg_train_loss = 0.0
         self.validation_step_outputs = []
         self.training_step_outputs = []
+        self.testing_step_outputs = []
+
 
     def configure_optimizers(self):
         return Adam(self.parameters(), lr=0.001)
@@ -162,12 +164,15 @@ class NeustonModel(ptl.LightningModule):
         outputs = self.forward(input_data)
         outputs = outputs.logits if isinstance(outputs,InceptionOutputs) else outputs
         outputs = softmax(outputs, dim=1)
-        return dict(test_outputs=outputs, test_srcs=input_srcs)
+        output_dict = dict(test_outputs=outputs, test_srcs=input_srcs)
+        self.testing_step_outputs.append(output_dict)
+        return output_dict
 
-    def test_epoch_end(self, steps):
 
+    def on_test_epoch_end(self):
         # handle single and multiple test dataloaders
         datasets = self.test_dataloader()
+        steps = self.testing_step_outputs
         if isinstance(datasets, list): datasets = [ds.dataset for ds in datasets]
         else: datasets = [datasets.dataset]
         if isinstance(steps[0],dict):
