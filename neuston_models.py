@@ -14,6 +14,8 @@ import pytorch_lightning as ptl
 from sklearn import metrics
 import numpy as np
 import ifcb
+import csv
+from datetime import datetime
 
 # project imports #
 from neuston_data import IfcbBinDataset
@@ -194,7 +196,14 @@ class NeustonModel(ptl.LightningModule):
             # a Datamodule. I expect input_obj is just the SRC passed in to args
             rr = self.RunResults(inputs=images, outputs=outputs, input_obj=None)
             RRs.append(rr)
-        self.log('RunResults',RRs)
+        #self.log('RunResults',RRs)
+        # write run results to a cvs file
+        now = datetime.now()
+        filename = "runResults" + now.strftime("%Y-%m-%d %H:%M:%S")
+        with open(filename, 'w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=['inputs', 'outputs'])
+            for rr in RRs:
+                writer.writerows(rr)
         #return dict(RunResults=RRs)
 
     class RunResults:
