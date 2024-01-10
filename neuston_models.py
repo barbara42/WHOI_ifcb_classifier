@@ -184,11 +184,14 @@ class NeustonModel(ptl.LightningModule):
             outputs = torch.cat([batch['test_outputs'] for batch in steps],dim=0).detach().cpu().numpy()
             images = [batch['test_srcs'] for batch in steps]
             images = [item for sublist in images for item in sublist]  # flatten list
-            if isinstance(dataset, IfcbBinDataset):
-                input_obj = dataset.bin.pid
-            else:
-                input_obj = dataset.input_src  # a path string
-            rr = self.RunResults(inputs=images, outputs=outputs, input_obj=input_obj)
+            # if isinstance(dataset, IfcbBinDataset):
+            #     input_obj = dataset.bin.pid
+            # else:
+            #     input_obj = dataset.input_src  # a path string
+            # rr = self.RunResults(inputs=images, outputs=outputs, input_obj=input_obj)
+            # removing because I can't figure out how to get the dataset object without creating
+            # a Datamodule. I expect input_obj is just the SRC passed in to args
+            rr = self.RunResults(inputs=images, outputs=outputs, input_obj=None)
             RRs.append(rr)
         self.log('RunResults',RRs)
         #return dict(RunResults=RRs)
