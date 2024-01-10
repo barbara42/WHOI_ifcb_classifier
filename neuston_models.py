@@ -172,15 +172,16 @@ class NeustonModel(ptl.LightningModule):
     def on_test_epoch_end(self):
         # handle single and multiple test dataloaders
         #datasets = self.test_dataloader()
-        datasets = self.dataloaders
         steps = self.testing_step_outputs
-        if isinstance(datasets, list): datasets = [ds.dataset for ds in datasets]
-        else: datasets = [datasets.dataset]
+        # datasets = []
+        # if isinstance(datasets, list): datasets = [ds.dataset for ds in datasets]
+        # else: datasets = [datasets.dataset]
         if isinstance(steps[0],dict):
             steps = [steps]
 
         RRs = []
-        for steps,dataset in zip(steps,datasets):
+        #for steps,dataset in zip(steps,datasets):
+        for steps in steps:
             outputs = torch.cat([batch['test_outputs'] for batch in steps],dim=0).detach().cpu().numpy()
             images = [batch['test_srcs'] for batch in steps]
             images = [item for sublist in images for item in sublist]  # flatten list
