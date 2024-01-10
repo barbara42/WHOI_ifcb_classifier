@@ -206,11 +206,16 @@ def do_run(args):
         run_results_callbacks.append(svr)
 
     # create trainer
-    trainer = Trainer(deterministic=True,
-                      gpus=len(args.gpus) if args.gpus else None,
-                      logger=False, checkpoint_callback=False,
-                      callbacks=run_results_callbacks,
-                      )
+    # trainer = Trainer(deterministic=True,
+    #                   gpus=len(args.gpus) if args.gpus else None,
+    #                   logger=False, checkpoint_callback=False,
+    #                   callbacks=run_results_callbacks,
+    #                   )
+    trainer = Trainer(deterministic=True, 
+                logger=False, 
+                callbacks=run_results_callbacks,
+                accelerator="gpu"
+                )
 
     # dataset filter if any
     filter_mode, filter_keywords = None,[]
