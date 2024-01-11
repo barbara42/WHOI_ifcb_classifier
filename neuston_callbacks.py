@@ -283,17 +283,23 @@ class SaveTestResults(ptl.callbacks.Callback):
         self.timestamp = timestamp
 
     def on_test_end(self, trainer, pl_module):
+        print(trainer.callback_metrics)
+        output_scores = trainer.callback_metrics["outputs"]
+        input_images = trainer.callback_metrics["inputs"]
+        model_id = pl_module.hparams.model_id
+        class_labels = pl_module.hparams.classes
+        save_run_results(input_images, output_scores, class_labels, self.timestamp, self.outdir, self.outfile, model_id)
 
-        RRs = trainer.callback_metrics['RunResults']
-        # RunResult rr: inputs, outputs, bin_id
-        if not isinstance(RRs,list):
-            RRs = [RRs]
+        # RRs = trainer.callback_metrics['RunResults']
+        # # RunResult rr: inputs, outputs, bin_id
+        # if not isinstance(RRs,list):
+        #     RRs = [RRs]
 
-        for rr in RRs:
-            input_obj = rr.input_obj
-            output_scores = rr.outputs
-            input_images = rr.inputs
-            model_id = pl_module.hparams.model_id
-            class_labels = pl_module.hparams.classes
+        # for rr in RRs:
+        #     input_obj = rr.input_obj
+        #     output_scores = rr.outputs
+        #     input_images = rr.inputs
+        #     model_id = pl_module.hparams.model_id
+        #     class_labels = pl_module.hparams.classes
 
-            save_run_results(input_images, output_scores, class_labels, self.timestamp, self.outdir, self.outfile, model_id, input_obj)
+        #     save_run_results(input_images, output_scores, class_labels, self.timestamp, self.outdir, self.outfile, model_id, input_obj)

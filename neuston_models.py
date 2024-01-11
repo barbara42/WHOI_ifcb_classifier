@@ -197,13 +197,14 @@ class NeustonModel(ptl.LightningModule):
             rr = self.RunResults(inputs=images, outputs=outputs, input_obj=None)
             RRs.append(rr)
         #self.log('RunResults',RRs)
+        self.log_dict({"inputs": images, "outputs": outputs})
         # write run results to a cvs file
-        now = datetime.now()
-        filename = "runResults" + now.strftime("%Y-%m-%d %H:%M:%S")
-        with open(filename, 'w', newline='') as file:
-            writer = csv.writer(file)
-            for rr in RRs:
-                writer.writerows(zip(rr.inputs, rr.outputs))
+        # now = datetime.now()
+        # filename = "runResults" + now.strftime("%Y-%m-%d %H:%M:%S")
+        # with open(filename, 'w', newline='') as file:
+        #     writer = csv.writer(file)
+        #     for rr in RRs:
+        #         writer.writerows(zip(rr.inputs, rr.outputs))
         #return dict(RunResults=RRs)
 
     class RunResults:
